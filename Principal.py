@@ -1,7 +1,15 @@
+
+from re import A
 import tkinter
 from tkinter import *
 from tkinter import font
 from tkinter import ttk
+import tkinter as tk
+from tkinter.messagebox import showwarning
+from tkinter import Button, scrolledtext, filedialog, messagebox
+from tkinter import filedialog
+from Credito import Creditos
+
 ventana=None
 VentanaP=None
 ventanacurso=None
@@ -10,6 +18,8 @@ ventanaListar=None
 ventanadelete=None
 ventanaAgregar=None
 ventanaeditar=None
+global lblespacio
+creditos = []
 def RetornarPrincipal():
     global ventana
     ventana.destroy()
@@ -38,29 +48,67 @@ def RetornarEditar():
     global ventanaeditar
     ventanaeditar.destroy()
     Gestionar1()
+def obtenerruta():
+    ruta = filedialog.askopenfilename(title='Cargar Archivo', filetypes = (("Text files", "*.lfp*"), ("all files", "*.*")))
+    return ruta
+
+
 def CargardeArchivo():
     #VENTANA
     global VentanaP
     global ventana
+    global txtRuta
+    global lblespacio
     VentanaP.destroy()
     ventana = tkinter.Tk()
     ventana.title("Seleccionar Archivo")
     ventana.geometry("600x200")
     ventana.config(bg="sky blue")
+    ventana.iconbitmap("favicon.ico")
     ventana.resizable(0,0)
-    #ETIQUETA
+    #ETIQUETAS
     lblruta = Label(ventana,text="Ruta:",font="Cambria 22", fg="#9625b7", bg="sky blue")
     lblruta.place(x=10,y=10)
+    lblespacio = Label(ventana,text="",font="Cambria 12", fg="black", bg="gray")
+    lblespacio.place(x=80,y=20)
     #ESPACIOS PARA ESCRIBIR
-    Entrada=StringVar
-    txtRuta=Entry(ventana,textvariable=Entrada,font="Cambria 22",fg="gray").place(x="110",y="20",width="450",height="30")
     #BOTONES
-    botonselec = Button(ventana,text="Seleccionar",fon="arial 20", fg="gray", bg="#e4ade4", relief="groove", bd=9)
+    botonselec = Button(ventana,text="Seleccionar",fon="arial 20", fg="gray", bg="#e4ade4", relief="groove", bd=9, command=leerArchivo)
     botonselec.place(x=200,y=80)
     botonregreso = Button(ventana,text="Regresar",fon="arial 20", fg="gray", bg="#e4ade4", command=RetornarPrincipal, relief="groove", bd=9)
     botonregreso.place(x=400,y=80)
     ventana.mainloop()
-    
+#FUNCION PARA LEER EL CONTENIDO DEL ARCHIVO CARGADO
+def leerArchivo():
+    global contenido
+    global lblespacio 
+    global creditos
+    ruta = obtenerruta()
+    if ruta != "":
+        archivo = open(ruta,"r",encoding="utf8")   
+        contenido = archivo.read()
+        lblespacio.configure(text=""+ruta)
+        print(contenido)
+        #creditos = []
+        contenido = contenido.split('\n')
+        for contenidoo in contenido:
+            data= contenidoo.split(",")
+            credito= Creditos(data[0], data[1],  data[3], data[4],data[5],data[6].rstrip('\n'))
+            agregarprerre(data[2], credito)
+            creditos.append(credito)
+            #print(credito)
+            print (data)
+        
+        messagebox.showinfo("Success","Archivo cargado")
+        return creditos
+    else:
+        messagebox.showinfo("Warning","No se cargó ningun archivo")
+def agregarprerre(prerre, cursoo):
+    if (prerre!= ""):
+        press = prerre.split(";")
+        for pe in press:
+            cursoo.prerrequisitos.append(pe)
+
 def Gestionar():
     global VentanaP
     global ventanacurso
@@ -70,6 +118,7 @@ def Gestionar():
     ventanacurso.title("Gestionar")
     ventanacurso.geometry("900x600")
     ventanacurso.config(bg="sky blue")
+    ventanacurso.iconbitmap("favicon.ico")
     ventanacurso.resizable(0,0)
     #BOTONES----------------------------------------
     #BOTON PARA LISTAR CURSOS  
@@ -96,6 +145,7 @@ def Gestionar1():
     ventanacurso.title("Gestionar")
     ventanacurso.geometry("900x600")
     ventanacurso.config(bg="sky blue")
+    ventanacurso.iconbitmap("favicon.ico")
     ventanacurso.resizable(0,0)
     #BOTONES----------------------------------------
     #BOTON PARA LISTAR CURSOS  
@@ -123,6 +173,7 @@ def ConteoDeCreditos():
     ventanaConteo.title("Conteo de Créditos")
     ventanaConteo.geometry("700x350")
     ventanaConteo.config(bg="sky blue")
+    ventanaConteo.iconbitmap("favicon.ico")
     ventanaConteo.resizable(0,0)
     #BOTON PARA REGRESAR
     botonsregresar = Button(ventanaConteo,text="Regresar",font="Cambria 22", fg="gray", bg="#e4ade4",relief="groove", bd=9, command=RetornarConteoPrincipal)
@@ -146,7 +197,7 @@ def ConteoDeCreditos():
     txtObligatorios=Entry(ventanaConteo,textvariable=Entrada,font="Cambria 22", fg="gray").place(x="500",y="120",width="60",height="30")
     lblsemestre= Label(ventanaConteo,text="Semestre",font="Cambria 22", fg="blue violet", bg="sky blue")
     lblsemestre.place(x=70,y=150)
-    conteo1 = ttk.Spinbox(from_=0, to=250)
+    conteo1 = ttk.Spinbox(from_=0, to=12)
     conteo1.place(x=190, y=163, width=50, height=20)
     #BOTON PARA CONTAR
     botoncontar = Button(ventanaConteo,text="Contar",font="Cambria 10", fg="gray", bg="#e4ade4",relief="groove")
@@ -157,7 +208,7 @@ def ConteoDeCreditos():
     txtDelSemestre=Entry(ventanaConteo,textvariable=Entrada1,font="Cambria 22", fg="gray").place(x="300",y="190",width="60",height="30")
     lblsemestre1= Label(ventanaConteo,text="Semestre",font="Cambria 22", fg="blue violet", bg="sky blue")
     lblsemestre1.place(x=70,y=220)
-    conteo2 = ttk.Spinbox(from_=0, to=250)
+    conteo2 = ttk.Spinbox(from_=0, to=12)
     conteo2.place(x=190, y=235, width=50, height=20)
     #BOTON PARA CONTAR
     botoncontar2 = Button(ventanaConteo,text="Contar",font="Cambria 10", fg="gray", bg="#e4ade4",relief="groove")
@@ -167,28 +218,41 @@ def ConteoDeCreditos():
 def Listar():
     global ventanacurso
     global ventanaListar
+    global arreglo
     ventanacurso.destroy()
     ventanaListar = tkinter.Tk()
     ventanaListar.title("Listar Cursos")
     ventanaListar.geometry("900x600")
     ventanaListar.config(bg="sky blue")
+    ventanaListar.iconbitmap("favicon.ico")
     ventanaListar.resizable(0,0)
-    tv = ttk.Treeview(ventanaListar,columns=("col1","col2","col3","col4","col5","col6"))
-    tv.column("#0",width=80)
-    tv.column("col1",width=80, anchor=CENTER)
+    tv = ttk.Treeview(ventanaListar,columns=("col0","col1","col2","col3","col4","col5","col6"))
+    tv.column("#0",width=0)
+    tv.column("col0",width=80, anchor=CENTER)
+    tv.column("col1",width=250, anchor=CENTER)
     tv.column("col2",width=80, anchor=CENTER)
     tv.column("col3",width=80, anchor=CENTER)
     tv.column("col4",width=80, anchor=CENTER)
     tv.column("col5",width=80, anchor=CENTER)
     tv.column("col6",width=80, anchor=CENTER)
-    tv.heading("#0", text="Código", anchor=CENTER)
+    tv.heading("col0", text="Código", anchor=CENTER)
     tv.heading("col1", text="Nombre", anchor=CENTER)
     tv.heading("col2", text="Pre requisitos", anchor=CENTER)
     tv.heading("col3", text="Opcionalidad", anchor=CENTER)
     tv.heading("col4", text="Semestre", anchor=CENTER)
     tv.heading("col5", text="Créditos", anchor=CENTER)
     tv.heading("col6", text="Estado", anchor=CENTER)
+    arreglo=[]
+    for aa in creditos:
+        var =""
+        for prerre in aa.prerrequisitos:
+            var +=prerre + "" 
+        arreglo.append((aa.codigo,aa.nombre,aa.prerrequisitos,aa.obligatorio,aa.semestre,aa.creditos,aa.estado))
+
+    for aaa in arreglo:
+        tv.insert("",tk.END,values=aaa)
     tv.pack()
+    tv.place(x=80,y=40)
     ##BOTON PARA REGRESAR
     botonregresar = Button(ventanaListar,text="Regresar", font="Cambria 22", fg="gray", bg="#e4ade4",relief="groove", bd=9,command=RetornarGestionListar)
     botonregresar.place(x=660,y=520)
@@ -202,6 +266,7 @@ def Eliminar():
     ventanadelete.title("Eliminar Curso")
     ventanadelete.geometry("600x200")
     ventanadelete.config(bg="sky blue")
+    ventanadelete.iconbitmap("favicon.ico")
     ventanadelete.resizable(0,0)
     #ETIQUETA
     lblCodigoCurso= Label(ventanadelete,text="Código de Curso",font="Cambria 22",fg="#9625b7", bg="sky blue")
@@ -224,6 +289,7 @@ def Agregar():
     ventanaAgregar.title("Agregar Curso")
     ventanaAgregar.geometry("900x400")
     ventanaAgregar.config(bg="sky blue")
+    ventanaAgregar.iconbitmap("favicon.ico")
     ventanaAgregar.resizable(0,0)
     #BOTON PARA REGRESAR
     botonsregresar = Button(ventanaAgregar,text="Regresar", font="Cambria 22", fg="gray", bg="#e4ade4",relief="groove", bd=9, command=RetornarAgregar)
@@ -271,6 +337,7 @@ def Editar():
     ventanaeditar.title("Editar Curso")
     ventanaeditar.geometry("900x450")
     ventanaeditar.config(bg="sky blue")
+    ventanaeditar.iconbitmap("favicon.ico")
     ventanaeditar.resizable(0,0)
     #BOTON PARA REGRESAR
     botonsregresar = Button(ventanaeditar,text="Regresar",fon="arial 20" ,fg="gray", bg="#e4ade4",relief="groove", bd=9, command=RetornarEditar)
@@ -317,6 +384,7 @@ def Principal():
     VentanaP.title("Practica 1")
     VentanaP.geometry("900x600")
     VentanaP.config(bg="sky blue")
+    VentanaP.iconbitmap("favicon.ico")
     VentanaP.resizable(0,0)
     #ETIQUETAS
     lblnombrecurso = Label(VentanaP,text="Nombre del Curso: Lab. Lenguajes Formales y de Programación",font="Cambria 22", fg="#9625b7", bg="sky blue")

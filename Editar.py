@@ -6,7 +6,9 @@ def Editar():
     ventanaeditar.title("Editar Curso")
     ventanaeditar.geometry("900x450")
     ventanaeditar.config(bg="sky blue")
+    ventanaeditar.iconbitmap('favicon.ico')
     ventanaeditar.resizable(0,0)
+    
     #BOTON PARA REGRESAR
     botonsregresar = Button(ventanaeditar,text="Regresar",fon="arial 20" ,fg="gray", bg="#e4ade4",relief="groove", bd=9)
     botonsregresar.place(x=720,y=350)

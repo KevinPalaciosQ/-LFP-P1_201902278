@@ -1,4 +1,6 @@
 
+from ast import Lambda
+from optparse import Option
 from re import A
 import tkinter
 from tkinter import *
@@ -8,8 +10,8 @@ import tkinter as tk
 from tkinter.messagebox import showwarning
 from tkinter import Button, scrolledtext, filedialog, messagebox
 from tkinter import filedialog
+from types import NoneType
 from Credito import Creditos
-
 ventana=None
 VentanaP=None
 ventanacurso=None
@@ -18,8 +20,15 @@ ventanaListar=None
 ventanadelete=None
 ventanaAgregar=None
 ventanaeditar=None
-global lblespacio
+txtcode=None
+txtname=None
+txtprerequest=None
+txtsemester=None
+txtcredits=None
+txtestate=None
+txtoption=None
 creditos = []
+arreglo=[]
 def RetornarPrincipal():
     global ventana
     ventana.destroy()
@@ -83,6 +92,7 @@ def leerArchivo():
     global contenido
     global lblespacio 
     global creditos
+    global credito
     ruta = obtenerruta()
     if ruta != "":
         archivo = open(ruta,"r",encoding="utf8")   
@@ -105,7 +115,7 @@ def leerArchivo():
         messagebox.showinfo("Warning","No se cargó ningun archivo")
 def agregarprerre(prerre, cursoo):
     if (prerre!= ""):
-        press = prerre.split(";")
+        press = prerre.split(",")
         for pe in press:
             cursoo.prerrequisitos.append(pe)
 
@@ -137,6 +147,10 @@ def Gestionar():
     botonregresar= Button(ventanacurso,text="Regresar",font="Cambria 22", fg="gray", bg="#e4ade4",command=RetornarGestionaPrincipal, relief="groove",bd=9, width="11")
     botonregresar.place(x=335,y=370)
     ventanacurso.mainloop()
+    #BOTON PARA MOSTRAR CURSO EN ESPECIFICO
+    botonmostrarespecifico= Button(ventanacurso,text="Mostrar",font="Cambria 22", fg="gray", bg="#e4ade4",relief="groove",bd=9, width="11")
+    botonmostrarespecifico.place(x=335,y=450)
+    ventanacurso.mainloop()
 def Gestionar1():
     global VentanaP
     global ventanacurso
@@ -163,6 +177,9 @@ def Gestionar1():
     #BOTON PARA REGRESAR
     botonregresar= Button(ventanacurso,text="Regresar",font="Cambria 22", fg="gray", bg="#e4ade4",command=RetornarGestionaPrincipal, relief="groove",bd=9, width="11")
     botonregresar.place(x=335,y=370)
+    #BOTON PARA MOSTRAR CURSO EN ESPECIFICO
+    botonmostrarespecifico= Button(ventanacurso,text="Mostrar",font="Cambria 22", fg="gray", bg="#e4ade4",relief="groove",bd=9, width="11")
+    botonmostrarespecifico.place(x=335,y=450)
     ventanacurso.mainloop()
 def ConteoDeCreditos():
     global VentanaP
@@ -214,7 +231,6 @@ def ConteoDeCreditos():
     botoncontar2 = Button(ventanaConteo,text="Contar",font="Cambria 10", fg="gray", bg="#e4ade4",relief="groove")
     botoncontar2.place(x=250,y=235)
     ventanaConteo.mainloop()
-
 def Listar():
     global ventanacurso
     global ventanaListar
@@ -222,15 +238,15 @@ def Listar():
     ventanacurso.destroy()
     ventanaListar = tkinter.Tk()
     ventanaListar.title("Listar Cursos")
-    ventanaListar.geometry("900x600")
+    ventanaListar.geometry("1050x600")
     ventanaListar.config(bg="sky blue")
     ventanaListar.iconbitmap("favicon.ico")
     ventanaListar.resizable(0,0)
     tv = ttk.Treeview(ventanaListar,columns=("col0","col1","col2","col3","col4","col5","col6"))
     tv.column("#0",width=0)
     tv.column("col0",width=80, anchor=CENTER)
-    tv.column("col1",width=250, anchor=CENTER)
-    tv.column("col2",width=80, anchor=CENTER)
+    tv.column("col1",width=350, anchor=CENTER)
+    tv.column("col2",width=160, anchor=CENTER)
     tv.column("col3",width=80, anchor=CENTER)
     tv.column("col4",width=80, anchor=CENTER)
     tv.column("col5",width=80, anchor=CENTER)
@@ -248,7 +264,6 @@ def Listar():
         for prerre in aa.prerrequisitos:
             var +=prerre + "" 
         arreglo.append((aa.codigo,aa.nombre,aa.prerrequisitos,aa.obligatorio,aa.semestre,aa.creditos,aa.estado))
-
     for aaa in arreglo:
         tv.insert("",tk.END,values=aaa)
     tv.pack()
@@ -258,6 +273,7 @@ def Listar():
     botonregresar.place(x=660,y=520)
     ventanaListar.mainloop()
 def Eliminar():
+
     global ventanacurso
     global ventanadelete
     ventanacurso.destroy()
@@ -272,17 +288,96 @@ def Eliminar():
     lblCodigoCurso= Label(ventanadelete,text="Código de Curso",font="Cambria 22",fg="#9625b7", bg="sky blue")
     lblCodigoCurso.place(x=10,y=10)
     #ESPACIOS PARA ESCRIBIR
-    Entrada=StringVar
-    txtRuta=Entry(ventanadelete,textvariable=Entrada,font="Cambria 22", fg="gray").place(x="230",y="20",width="350",height="30")
+    txtEliminar=ttk.Entry(ventanadelete,font="Cambria 22")
+    txtEliminar.place(x="230",y="20",width="100",height="30")
     #BOTONES
     botoneliminar = Button(ventanadelete,text="Eliminar", font="Cambria 22",  fg="gray", bg="#e4ade4",relief="groove", bd=9)
     botoneliminar.place(x=200,y=80)
     botonregresoeliminar = Button(ventanadelete,text="Regresar", font="Cambria 22",  fg="gray", bg="#e4ade4",relief="groove", bd=9, command=RetornarEliminar)
     botonregresoeliminar.place(x=400,y=80)
     ventanadelete.mainloop()
+def Mostrar():
+    global ventanacurso
+    global ventamostrar
+    #ventanacurso.destroy()
+    #VENTANA
+    ventaamostrar = tkinter.Tk()
+    ventaamostrar.title("Mostrar Curso en Específico")
+    ventaamostrar.geometry("900x450")
+    ventaamostrar.config(bg="sky blue")
+    ventaamostrar.iconbitmap("favicon.ico")
+    ventaamostrar.resizable(0,0)
+    #BOTON PARA REGRESAR
+    botonback = Button(ventaamostrar,text="Regresar",fon="arial 20" ,fg="gray", bg="#e4ade4",relief="groove", bd=9)
+    botonback.place(x=720,y=350)
+    #BOTON PARA AGREGAR
+    botonshow = Button(ventaamostrar,text="Mostrar",fon="arial 20", fg="gray", bg="#e4ade4",relief="groove", bd=9)
+    botonshow.place(x=560,y=350)
+    #ETIQUETAS
+    lblcodigo= Label(ventaamostrar,text="Código",font="Cambria 22", fg="#9625b7", bg="sky blue")
+    lblcodigo.place(x=10,y=10)
+    lblnombre= Label(ventaamostrar,text="Nombre",font="Cambria 22", fg="#9625b7", bg="sky blue")
+    lblnombre.place(x=10,y=45)
+    lblprerequisito= Label(ventaamostrar,text="Pre Requisito",font="Cambria 22", fg="#9625b7", bg="sky blue")
+    lblprerequisito.place(x=10,y=80)
+    lblsemestre= Label(ventaamostrar,text="Semestre",font="Cambria 22", fg="#9625b7", bg="sky blue")
+    lblsemestre.place(x=10,y=115)
+    lblopcionalidad= Label(ventaamostrar,text="Opcionalidad",font="Cambria 22", fg="#9625b7", bg="sky blue")
+    lblopcionalidad.place(x=10,y=150)
+    lblcreditos= Label(ventaamostrar,text="Créditos",font="Cambria 22", fg="#9625b7", bg="sky blue")
+    lblcreditos.place(x=10,y=185)
+    lblestado= Label(ventaamostrar,text="Estado",font="Cambria 22", fg="#9625b7", bg="sky blue")
+    lblestado.place(x=10,y=220)
+    #ESPACIOS PARA ESCRIBIR
+    txtmostrarcodigo=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txtmostrarcodigo.place(x="185",y="20",width="600",height="30")
+    txtmostrarnombre=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txtmostrarnombre.place(x="185",y="55",width="600",height="30")
+    txtmostrarprerrequisito=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txtmostrarprerrequisito.place(x="185",y="90",width="600",height="30")
+    txtmostrarsemestre=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txtmostrarsemestre.place(x="185",y="125",width="600",height="30")
+    txtmostraropcionalidad=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txtmostraropcionalidad.place(x="185",y="160",width="600",height="30")
+    txtmostrarcreeditos=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txtmostrarcreeditos.place(x="185",y="195",width="600",height="30")
+    txtmostrarestado=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txtmostrarestado.place(x="185",y="230",width="600",height="30")
+    ventanaeditar.mainloop()
+
+def AgregaCurso():
+    global txtcode
+    global txtname
+    global txtprerequest
+    global txtsemester
+    global txtoption
+    global txtcredits
+    global txtestate
+    global arreglo
+    print(txtcode.get())
+    print(txtname.get())
+    print(txtprerequest.get())
+    print(txtsemester.get())
+    print(txtoption.get())
+    print(txtcredits.get())
+    print(txtestate.get())
+    if (txtcode.get()!= "" and txtname.get()!="" and txtprerequest.get()!="" and txtsemester.get()!="" and txtoption.get()!="" and txtcredits.get()!="" and txtestate.get()!=""):
+        niu=Creditos(txtcode.get(),txtname.get(),txtsemester.get(),txtoption.get(),txtcredits.get(),txtestate.get())
+        agregarprerre(txtprerequest.get(), niu)
+        creditos.append(niu) 
+        messagebox.showinfo("Success","Se agregó el Archivo")
+    elif (txtcode.get()== "" and txtname.get()=="" and txtprerequest.get()=="" and txtsemester.get()=="" and txtoption.get()=="" and txtcredits.get()=="" and txtestate.get() ==""):
+        messagebox.showinfo("Warning","No se cargó ningun archivo")
 def Agregar():
     global ventanacurso
     global ventanaAgregar
+    global txtcode
+    global txtname
+    global txtprerequest
+    global txtsemester
+    global txtoption
+    global txtcredits
+    global txtestate
     ventanacurso.destroy()
     #VENTANA
     ventanaAgregar = tkinter.Tk()
@@ -294,9 +389,7 @@ def Agregar():
     #BOTON PARA REGRESAR
     botonsregresar = Button(ventanaAgregar,text="Regresar", font="Cambria 22", fg="gray", bg="#e4ade4",relief="groove", bd=9, command=RetornarAgregar)
     botonsregresar.place(x=720,y=310)
-    #BOTON PARA AGREGAR
-    botonagregar = Button(ventanaAgregar,text="Agregar", font="Cambria 22", fg="gray", bg="#e4ade4",relief="groove", bd=9)
-    botonagregar.place(x=560,y=310)
+
     #ETIQUETAS
     lblcodigo= Label(ventanaAgregar,text="Código",font="Cambria 22",fg="#9625b7", bg="sky blue")
     lblcodigo.place(x=10,y=10)
@@ -313,20 +406,23 @@ def Agregar():
     lblestado= Label(ventanaAgregar,text="Estado",font="Cambria 22", fg="#9625b7", bg="sky blue")
     lblestado.place(x=10,y=220)
     #ESPACIOS PARA ESCRIBIR
-    codigo=StringVar
-    txtcodigo=Entry(ventanaAgregar,textvariable=codigo,font="Cambria 22", fg="gray").place(x="185",y="20",width="600",height="30")
-    nombre=StringVar
-    txtnombre=Entry(ventanaAgregar,textvariable=nombre,font="Cambria 22", fg="gray").place(x="185",y="55",width="600",height="30")
-    pre=StringVar
-    txtpre=Entry(ventanaAgregar,textvariable=pre,font="Cambria 22", fg="gray").place(x="185",y="90",width="600",height="30")
-    semestre=StringVar
-    txtsem=Entry(ventanaAgregar,textvariable=semestre,font="Cambria 22", fg="gray").place(x="185",y="125",width="600",height="30")
-    opcionalidad=StringVar
-    txtop=Entry(ventanaAgregar,textvariable=opcionalidad,font="Cambria 22", fg="gray").place(x="185",y="160",width="600",height="30")
-    creditos=StringVar
-    txtcred=Entry(ventanaAgregar,textvariable=creditos,font="Cambria 22", fg="gray").place(x="185",y="195",width="600",height="30")
-    estado=StringVar
-    txtestado=Entry(ventanaAgregar,textvariable=estado,font="Cambria 22", fg="gray").place(x="185",y="230",width="600",height="30")
+    txtcode=ttk.Entry(ventanaAgregar,font="Cambria 22")
+    txtcode.place(x="185",y="20",width="600",height="30")
+    txtname=ttk.Entry(ventanaAgregar,font="Cambria 22")
+    txtname.place(x="185",y="55",width="600",height="30")
+    txtprerequest=ttk.Entry(ventanaAgregar,font="Cambria 22")
+    txtprerequest.place(x="185",y="90",width="600",height="30")
+    txtsemester=ttk.Entry(ventanaAgregar,font="Cambria 22")
+    txtsemester.place(x="185",y="125",width="600",height="30")
+    txtoption=ttk.Entry(ventanaAgregar,font="Cambria 22")
+    txtoption.place(x="185",y="160",width="600",height="30")
+    txtcredits=ttk.Entry(ventanaAgregar,font="Cambria 22")
+    txtcredits.place(x="185",y="195",width="600",height="30")
+    txtestate=ttk.Entry(ventanaAgregar,font="Cambria 22")
+    txtestate.place(x="185",y="230",width="600",height="30")
+    #BOTON PARA AGREGAR
+    botonagregar = Button(ventanaAgregar,text="Agregar", font="Cambria 22", fg="gray", bg="#e4ade4",relief="groove", bd=9, command=AgregaCurso)
+    botonagregar.place(x=560,y=310)
     ventanaAgregar.mainloop()
 def Editar():
     global ventanacurso
@@ -361,20 +457,21 @@ def Editar():
     lblestado= Label(ventanaeditar,text="Estado",font="Cambria 22", fg="#9625b7", bg="sky blue")
     lblestado.place(x=10,y=220)
     #ESPACIOS PARA ESCRIBIR
-    codigoeditar=StringVar
-    txtcodigo=Entry(ventanaeditar,textvariable=codigoeditar,font="Cambria 22", fg="gray").place(x="185",y="20",width="600",height="30")
-    nombreeditar=StringVar
-    txtnombre=Entry(ventanaeditar,textvariable=nombreeditar,font="Cambria 22", fg="gray").place(x="185",y="55",width="600",height="30")
-    preeditar=StringVar
-    txtpre=Entry(ventanaeditar,textvariable=preeditar,font="Cambria 22", fg="gray").place(x="185",y="90",width="600",height="30")
-    semestreeditar=StringVar
-    txtsem=Entry(ventanaeditar,textvariable=semestreeditar,font="Cambria 22", fg="gray").place(x="185",y="125",width="600",height="30")
-    opcionalidadeditar=StringVar
-    txtop=Entry(ventanaeditar,textvariable=opcionalidadeditar,font="Cambria 22", fg="gray").place(x="185",y="160",width="600",height="30")
-    creditoseditar=StringVar
-    txtcred=Entry(ventanaeditar,textvariable=creditoseditar,font="Cambria 22", fg="gray").place(x="185",y="195",width="600",height="30")
-    estadoeditar=StringVar
-    txtestado=Entry(ventanaeditar,textvariable=estadoeditar,font="Cambria 22", fg="gray").place(x="185",y="230",width="600",height="30")
+    txteditarcodigo=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txteditarcodigo.place(x="185",y="20",width="600",height="30")
+    txteditarnombre=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txteditarnombre.place(x="185",y="55",width="600",height="30")
+    txteditarprerrequisito=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txteditarprerrequisito.place(x="185",y="90",width="600",height="30")
+    txteditarsemestre=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txteditarsemestre.place(x="185",y="125",width="600",height="30")
+
+    txteditaropcionalidad=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txteditaropcionalidad.place(x="185",y="160",width="600",height="30")
+    txteditarcreeditos=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txteditarcreeditos.place(x="185",y="195",width="600",height="30")
+    txteditarestado=ttk.Entry(ventanaeditar,font="Cambria 22")
+    txteditarestado.place(x="185",y="230",width="600",height="30")
 
     ventanaeditar.mainloop()
 def Principal():

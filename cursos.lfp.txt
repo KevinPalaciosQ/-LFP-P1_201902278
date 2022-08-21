@@ -3,6 +3,8 @@
 69,Técnica complementaria 1,,1,1,3,0
 152,Física 2,107;150,1,4,6,0
 39,Deportes 1,,0,1,1,-1
+
+
 348,Quimica General 1,,1,1,3,0
 6,Idioma técnico 1,,0,0,2,-1
 19,Social Humaní­stica 2,17,1,2,4,0
@@ -12,6 +14,8 @@
 40,Deportes 2,39,0,2,1,-1
 8,Idioma técnico 2,6,0,2,2,-1
 795,Lógica de Sistemas,103,1,3,2,0
+
+
 960,Mate Computo 1,103,1,3,5,0
 770,IPC1,103,1,3,4,0
 107,Mate Intermedia 1,103,1,3,10,0
@@ -37,4 +41,4 @@
 368,Principios,732;152;348,0,5,3,-1
 650,Conta,,0,5,3,-1
 28,Ecologia,,0,5,3,-1
-152,Física 2,107;150,1,4,6,0
+152,Física 2,107;150,1,4,6,0    

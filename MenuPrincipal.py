@@ -688,6 +688,6 @@ def Principal():
     botonsalir = Button(VentanaP,text="Salir",font="Cambria 22", fg="gray", bg="#e4ade4", command=exit, relief="groove", bd=9,width="15")
     botonsalir.place(x=320,y=430)
     VentanaP.mainloop()
-Principal()
-
+if __name__ == "__main__":
+    Principal()
 
